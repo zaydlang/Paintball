@@ -37,7 +37,7 @@ public class Enemy extends Element {
     	updatePos(xVel, yVel);
     }
 
-    public Element[][] move(String action, Element[][] data) {/*
+    public Element[][] move(String action, Element[][] data) {
         double oldXVel = xVel;
         double oldYVel = yVel;
         double oldX = getX();
@@ -46,46 +46,39 @@ public class Enemy extends Element {
 		updatePos(xVel, yVel);
           
         int j = 0;
-		for (int i = 0; data[j][i] != null; i++) {
-
-            if (getY() - oldY > 1) yVel = 1;
-			if (BoundingBox.intersects(this, data[j][i]) || BoundingBox.intersects(data[2][i], this)) {
-                if (j == 0 && i == 0) ((Player)data[j][i]).getHurt();
-				if (!BoundingBox.isAbove(this, data[j][i])) {
-					//setX(oldX - (getX() - oldX));
-    				yVel += Constants.GRAVITY;
-			    }
-
-                if (BoundingBox.hitRoof(this, data[j][i])) {
-System.out.println("ASDJIFAKSDFADSF");
-                    yVel = Constants.GRAVITY;		
-                    updatePos(0, yVel);
-                } else {
-					setY(oldY - (getY() - oldY));
-                    yVel = 0;
+		for (int i = 0; data[2][i] != null; i++) {
+			if (BoundingBox.intersects(this, data[2][i]) || BoundingBox.intersects(data[2][i], this)) {
+				if (BoundingBox.isAbove(this, data[2][i], Constants.BUFFER)) {
+					yVel = 0;
+					setY(data[2][i].getY() + data[2][i].getHeight());
+					//enablePhysics = true;
+				} 
+				
+				if (BoundingBox.hitRoof(this, data[2][i], Constants.BUFFER)) {
+					yVel = Constants.GRAVITY;
+					updatePos(0, yVel);
+				} 
+				
+				if (BoundingBox.hitLeft(this, data[2][i], Constants.BUFFER)) {
+					xVel = xVel > 0 ? -xVel : xVel;
+					setX(data[2][i].getX() - this.getWidth());
+					//yVel += Constants.GRAVITY;
 				}
-//System.out.println(BoundingBox.isAbove(this, data[j][i]));
-                if (((BoundingBox.hitLeft(this, data[j][i])) || (BoundingBox.hitRight(this, data[j][i]))) && (!BoundingBox.hitRoof(this, data[j][i]) && !(BoundingBox.isAbove(this, data[j][i])))) { xVel *= -1; //System.out.println("HIT: " + getX() + " " + getY() + " " + data[j][i].getY() + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-}
+				
+				if (BoundingBox.hitRight(this, data[2][i], Constants.BUFFER)) {
+					xVel = xVel < 0 ? -xVel : xVel;
+					setX(data[2][i].getX() + data[2][i].getWidth());
+					//yVel += Constants.GRAVITY;
+				}
 
-				enablePhysics = false;
-			    i = 0;
-
-		    } else {
-		        enablePhysics = true;
-		    }
-         
-            if (j == 0) {
-				j = 2;
-                i--;
-            }
-	    }
-
-		return data;*/ return null;
+				//enablePhysics = false;
+				i = 0;
+			}
+		}
+		return data;
 	}
 	
     public void updatePos(double xVel, double yVel) {
-        System.out.println(getX() + " " + getY() + " " + xVel + " " + yVel);
         setX(getX() + xVel);
         setY(getY() + yVel);
     }

@@ -15,7 +15,9 @@ import java.util.ArrayList;
 
 public final class Constants {
     // Runtime
-    public static final int    REFRESH_TIMER = 1;
+    public static final int    FRAMES_PER_SECOND   = 60;
+    public static final int    REFRESH_TIMER       = (1 / FRAMES_PER_SECOND) / 1000;
+    public static final int    UPDATE_TIMER        = 1;  
 
     // Display  
     public static final int    WIDTH               = 1200;
@@ -23,7 +25,7 @@ public final class Constants {
     public static final int    IFW                 = JComponent.WHEN_IN_FOCUSED_WINDOW;
 
     // Physics
-    public static final double GRAVITY             = (-5 / (1000 / (double)REFRESH_TIMER));
+    public static final double GRAVITY             = -1;
     public static final double FRIC                = 0.9;
 
     // Player
@@ -34,7 +36,7 @@ public final class Constants {
     public static final String JUMP                = "jump";
     public static final double PLAYER_MOVE_SPEED   = 0.3;
     public static final double PLAYER_ACC          = 0.1;
-    public static final double PLAYER_JUMP_SPEED   = 1;
+    public static final double PLAYER_JUMP_SPEED   = 3;
     public static final double PLAYER_MASS         = 1;
 
     // Enemy 1

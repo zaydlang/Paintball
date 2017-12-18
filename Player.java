@@ -11,10 +11,16 @@ import java.awt.geom.*;
 
 import java.lang.Math.*;
 
+import java.util.ArrayList;
+
 public class Player extends Element {
     private double xVel = 0;
     private double yVel = 0;
-    
+    private double oldXVel;
+	private double oldYVel;
+	private double oldX;
+	private double oldY;
+
     private boolean movingLeft  = false;
     private boolean movingRight = false;
     
@@ -23,51 +29,34 @@ public class Player extends Element {
     private boolean enableGravity = true;
 	private boolean onGround      = false;
 
+	private double dt = 0;
+
     public Player(double x, double y, double width, double height) {
     	super(x, y, width, height, Color.GREEN);   	
     	setUpdate(true);
     }
     
     public void update() {
-
-        if (enablePhysics) {
-	    	if (xVel > 0) {
-		    	xVel += Constants.PLAYER_MASS * Constants.GRAVITY * Constants.FRIC;
-		        if (xVel < 0) xVel = 0;
-		    }
-
-		    if (xVel < 0) {
-		  	 	xVel -= Constants.PLAYER_MASS * Constants.GRAVITY * Constants.FRIC;
-		        if (xVel > 0) xVel = 0;
-		    }
-	    }
-
-        if (getY() <= 0) {
-			setY(0);
-			yVel = 0;      
-	    } else if (enableGravity) {
-    		yVel += Constants.GRAVITY;
-    	}
-
     	updatePos(xVel, yVel);
     }
     
     public Element[][] move(String action, Element[][] data) {
-        double oldXVel = xVel;
-        double oldYVel = yVel;
-        double oldX = getX();
-        double oldY = getY();
+        dt = System.currentTimeMillis() - dt;
+        oldXVel = xVel;
+        oldYVel = yVel;
+        oldX = getX();
+        oldY = getY();
 
 		if (action.equals("move left") || movingLeft) {
 		    movingLeft = true;	
 		    
             // Smooth Turning in mid-air
             if ((getY() != 0 && !enablePhysics) && xVel > 0) {
-			    xVel -= Constants.PLAYER_ACC;
+			    xVel -= Constants.PLAYER_ACC * dt;
 		    }
 		    
-			xVel -= Constants.PLAYER_ACC;
-            if (-xVel > Constants.PLAYER_MOVE_SPEED) xVel = -Constants.PLAYER_MOVE_SPEED; 
+			xVel -= Constants.PLAYER_ACC * dt;
+            if (-xVel > Constants.PLAYER_MOVE_SPEED) xVel = -Constants.PLAYER_MOVE_SPEED * dt; 
 		}
 
         if (action.equals("move right") || movingRight) {	
@@ -75,16 +64,16 @@ public class Player extends Element {
             
             // Smooth Turning in mid-air
             if (getY() != 0 && xVel < 0) {
-			    xVel += Constants.PLAYER_ACC;
+			    xVel += Constants.PLAYER_ACC * dt;
 		    }
 		    
-			xVel += Constants.PLAYER_ACC;
-            if (xVel > Constants.PLAYER_MOVE_SPEED) xVel = Constants.PLAYER_MOVE_SPEED;
+			xVel += Constants.PLAYER_ACC * dt;
+            if (xVel > Constants.PLAYER_MOVE_SPEED) xVel = Constants.PLAYER_MOVE_SPEED * dt;
 		}
 
         if (action.equals("jump") && (getY() == 0 || enableJump)) {
 			if (yVel < 0) yVel = 0;
-			yVel += Constants.PLAYER_JUMP_SPEED;
+			yVel += Constants.PLAYER_JUMP_SPEED * dt;
             setY(getY() + 1);
             enableJump = false;
 		}
@@ -98,45 +87,79 @@ public class Player extends Element {
 
 		updatePos(xVel, yVel);
 
+
+
+		if (enablePhysics) {
+	    	if (xVel > 0) {
+		    	xVel += Constants.PLAYER_MASS * Constants.GRAVITY * Constants.FRIC * dt;
+		        if (xVel < 0) xVel = 0;
+		    }
+
+		    if (xVel < 0) {
+		  	 	xVel -= Constants.PLAYER_MASS * Constants.GRAVITY * Constants.FRIC * dt;
+		        if (xVel > 0) xVel = 0;
+		    }
+	    }
+
+        if (getY() <= 0) {
+			setY(0);
+			yVel = 0;      
+	    } else if (enableGravity) {
+    		yVel += Constants.GRAVITY * dt;
+    	}
+
+
+
 		onGround = false;
 		for (int i = 0; data[2][i] != null; i++) {
 			if (BoundingBox.intersects(this, data[2][i]) || BoundingBox.intersects(data[2][i], this)) {
+System.out.println(i);
 				if (BoundingBox.isAbove(this, data[2][i], Constants.BUFFER)) {
+System.out.println("S");
 					yVel = 0;
 					setY(data[2][i].getY() + data[2][i].getHeight());
 					enableJump = true;
 					//enablePhysics = true;
 					onGround = true;
+					i = -1;
 				} 
 				
 				if (BoundingBox.hitRoof(this, data[2][i], Constants.BUFFER)) {
-					yVel = Constants.GRAVITY;
+
+System.out.println("H");
+					yVel = Constants.GRAVITY * dt; 
 					updatePos(0, yVel);
 					enableJump = false;
+					i = -1;
 				} 
 				
 				if (BoundingBox.hitLeft(this, data[2][i], Constants.BUFFER)) {
+
+System.out.println("I");
 					setX(data[2][i].getX() - this.getWidth());
 					//yVel += Constants.GRAVITY;
 					enableJump = true;
+					i = -1;
 				}
 				
 				if (BoundingBox.hitRight(this, data[2][i], Constants.BUFFER)) {
+System.out.println("T");
 					setX(data[2][i].getX() + data[2][i].getWidth());
 					//yVel += Constants.GRAVITY;
 					enableJump = true;
+					i = -1;
 				}
 
 				//enablePhysics = false;
-				i = 0;
 			}
 		}
 
+		dt = System.currentTimeMillis();
 		return data;
 	}
 	
     public void updatePos(double xVel, double yVel) {
-        //System.out.println(getX() + " " + getY() + " " + xVel + " " + yVel);
+        System.out.println(getX() + " " + getY() + " " + xVel + " " + yVel);
         setX(getX() + xVel);
         setY(getY() + yVel);
     }

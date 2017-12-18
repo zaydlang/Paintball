@@ -51,7 +51,7 @@ public class Level {
             String action = actionQueue.get(0);
             
             data = data[0][0].move(action, data);
-           //data = data[3][0].move("", data);
+            //data = data[3][0].move("", data);
         }
         
         data = data[0][0].move("", data);
