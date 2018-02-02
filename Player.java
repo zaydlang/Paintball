@@ -29,7 +29,7 @@ public class Player extends Element {
     private boolean enableGravity = true;
 	private boolean onGround      = false;
 
-	private double dt = 0;
+	private double dt = System.currentTimeMillis();
 
     public Player(double x, double y, double width, double height) {
     	super(x, y, width, height, Color.GREEN);   	
@@ -70,7 +70,7 @@ public class Player extends Element {
 			xVel += Constants.PLAYER_ACC * dt;
             if (xVel > Constants.PLAYER_MOVE_SPEED) xVel = Constants.PLAYER_MOVE_SPEED * dt;
 		}
-
+		
         if (action.equals("jump") && (getY() == 0 || enableJump)) {
 			if (yVel < 0) yVel = 0;
 			yVel += Constants.PLAYER_JUMP_SPEED * dt;
@@ -86,8 +86,6 @@ public class Player extends Element {
 		}
 
 		updatePos(xVel, yVel);
-
-
 
 		if (enablePhysics) {
 	    	if (xVel > 0) {
@@ -112,54 +110,85 @@ public class Player extends Element {
 
 		onGround = false;
 		for (int i = 0; data[2][i] != null; i++) {
+			boolean[] hitFlags = BoundingBox.getCollisions(this, data[2][i]);
+			
+			if (hitFlags[0]) {
+				yVel = 0;
+				setY(data[2][i].getY() + data[2][i].getHeight());
+				enableJump = true;
+				onGround = true;
+			}
+			
+			if (hitFlags[1]) {
+				setX(data[2][i].getX() - this.getWidth());
+				xVel = 0;
+				yVel += Constants.GRAVITY;
+				enableJump = true;
+			}
+			
+			if (hitFlags[2]) {
+				setX(data[2][i].getX() + data[2][i].getWidth());
+				xVel = 0;
+				yVel += Constants.GRAVITY;
+				enableJump = true;
+			}
+			
+			if (hitFlags[3]) {
+				yVel = Constants.GRAVITY * dt; 
+				updatePos(0, yVel);
+				enableJump = false;
+			}
+			
+			if (hitFlags[0] || hitFlags[1] || hitFlags[2] || hitFlags[3]) i = -1;
+	    }
+		/*
 			if (BoundingBox.intersects(this, data[2][i]) || BoundingBox.intersects(data[2][i], this)) {
-System.out.println(i);
 				if (BoundingBox.isAbove(this, data[2][i], Constants.BUFFER)) {
-System.out.println("S");
 					yVel = 0;
 					setY(data[2][i].getY() + data[2][i].getHeight());
 					enableJump = true;
 					//enablePhysics = true;
 					onGround = true;
 					i = -1;
+					continue;
 				} 
 				
 				if (BoundingBox.hitRoof(this, data[2][i], Constants.BUFFER)) {
-
-System.out.println("H");
+				System.out.println("OUCH!");
 					yVel = Constants.GRAVITY * dt; 
 					updatePos(0, yVel);
 					enableJump = false;
 					i = -1;
+					continue;
 				} 
 				
 				if (BoundingBox.hitLeft(this, data[2][i], Constants.BUFFER)) {
-
-System.out.println("I");
 					setX(data[2][i].getX() - this.getWidth());
+					System.out.println("BEEP");
 					//yVel += Constants.GRAVITY;
 					enableJump = true;
 					i = -1;
+					continue;
 				}
 				
 				if (BoundingBox.hitRight(this, data[2][i], Constants.BUFFER)) {
-System.out.println("T");
 					setX(data[2][i].getX() + data[2][i].getWidth());
 					//yVel += Constants.GRAVITY;
 					enableJump = true;
 					i = -1;
+					continue;
 				}
 
 				//enablePhysics = false;
 			}
-		}
+		}*/
 
 		dt = System.currentTimeMillis();
 		return data;
 	}
 	
     public void updatePos(double xVel, double yVel) {
-        System.out.println(getX() + " " + getY() + " " + xVel + " " + yVel);
+        //System.out.println(getX() + " " + getY() + " " + xVel + " " + yVel);
         setX(getX() + xVel);
         setY(getY() + yVel);
     }

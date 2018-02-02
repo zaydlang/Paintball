@@ -52,8 +52,8 @@ public class Display extends JComponent implements ActionListener {
       data[2][0] = new Solid(600, 100, 100, 500);
       data[2][1] = new Solid(800, 0, 100, 500);
       data[2][2] = new Solid(0, 200, 400, 100);
-      //data[2][2] = new Solid(700, 100, 100, 100);
-      //data[2][3] = new Solid(400, 200, 100, 100);
+      data[2][2] = new Solid(700, 100, 100, 100);
+      data[2][3] = new Solid(400, 200, 100, 100);
       //data[3][0] = new Enemy(400, 500, 50, 50);
 
       setSize(new Dimension(Constants.WIDTH, Constants.HEIGHT)); 
@@ -98,12 +98,12 @@ public class Display extends JComponent implements ActionListener {
    @Override
    public synchronized void actionPerformed(ActionEvent e) {
       if (e.getSource() == refreshTimer) {
-System.out.println("REPAINT");
+//System.out.println("REPAINT");
          repaint();
       }
 
       if (e.getSource() == updateTimer) {
-System.out.println("BUILDING");
+//System.out.println("BUILDING");
       	 level.buildLevel(actionQueue);
       }
    }
@@ -112,7 +112,7 @@ System.out.println("BUILDING");
       Display disp = new Display();
 
       JFrame frame = new JFrame();
-      frame.setTitle("Pickaxe");
+      frame.setTitle("Paintball");
       frame.add(disp);
       frame.pack();
       frame.setResizable(false);
