@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public final class Constants {
     // Runtime
-    public static final int    FRAMES_PER_SECOND   = 100;
+    public static final int    FRAMES_PER_SECOND   = 60;
     public static final int    UPDATES_PER_SECOND  = 100; // basically try as often as you can
     public static final int    REFRESH_TIMER       = 1000 / FRAMES_PER_SECOND;
     public static final int    UPDATE_TIMER        = 1000 / UPDATES_PER_SECOND;
@@ -36,7 +36,7 @@ public final class Constants {
     public static final String MOVE_RIGHT_RELEASED = "move right released";
     public static final String JUMP                = "jump";
     public static final double PLAYER_MOVE_SPEED   = 0.3;
-    public static final double PLAYER_ACC          = 0.1;
+    public static final double PLAYER_ACC          = 0.3;
     public static final double PLAYER_JUMP_SPEED   = 1;
     public static final double PLAYER_MASS         = 1;
 

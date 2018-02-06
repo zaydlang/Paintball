@@ -12,6 +12,8 @@ import java.awt.geom.*;
 import java.lang.Math.*;
 
 import java.util.ArrayList;
+import java.net.*;
+import java.util.*;
 
 public class Player extends Element {
     private double xVel = 0;
@@ -31,6 +33,13 @@ public class Player extends Element {
 
 	private double dt = System.currentTimeMillis();
 
+	private Socket s;
+	private InputStream instream;
+	private OutputStream outstream;
+	private Scanner in;
+	private PrintWriter out;
+	private boolean connected = false;
+	
     public Player(double x, double y, double width, double height) {
     	super(x, y, width, height, Color.GREEN);   	
     	setUpdate(true);
@@ -38,6 +47,28 @@ public class Player extends Element {
     
     public void update() {
     	updatePos(xVel, yVel);
+    	
+    	if (connected) {
+    		out.println("loc: " + getX() + " " + getY());
+    		out.flush();
+    	}
+    }
+    
+    public boolean connect(String ip, int port) {
+		try {
+		    s         = new Socket(ip, port);
+		  	instream  = s.getInputStream();
+		  	outstream = s.getOutputStream();
+		  	in        = new Scanner(instream);
+		    out       = new PrintWriter(outstream); 
+		    
+		    connected = true;
+		    
+		    out.println("gc 0");
+		    out.flush();
+		} catch (Exception e) { return false; }
+        
+        return true;
     }
     
     public Element[][] move(String action, Element[][] data) {
@@ -72,7 +103,7 @@ public class Player extends Element {
 		}
 		
         if (action.equals("jump") && (getY() == 0 || enableJump)) {
-			if (yVel < 0) yVel = 0;
+			//if (yVel < 0) yVel = 0;
 			yVel += Constants.PLAYER_JUMP_SPEED * dt;
             setY(getY() + 1);
             enableJump = false;
@@ -84,8 +115,6 @@ public class Player extends Element {
 		if (action.equals("grapple")) {
 		   data[1][0] = new Grapple(getX(), getY(), Constants.GRAPPLE_SIZE, Constants.GRAPPLE_SIZE, Constants.GRAPPLE_SPEED);
 		}
-
-		updatePos(xVel, yVel);
 
 		if (enablePhysics) {
 	    	if (xVel > 0) {
@@ -105,8 +134,6 @@ public class Player extends Element {
 	    } else if (enableGravity) {
     		yVel += Constants.GRAVITY * dt;
     	}
-
-
 
 		onGround = false;
 		for (int i = 0; data[2][i] != null; i++) {

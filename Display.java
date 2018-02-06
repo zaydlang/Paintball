@@ -48,12 +48,14 @@ public class Display extends JComponent implements ActionListener {
    }
 
    public void init() {
-      data[0][0] = new Player(0, 1200, 50, 50);
-      data[2][0] = new Solid(600, 100, 100, 500);
-      data[2][1] = new Solid(800, 0, 100, 500);
-      data[2][2] = new Solid(0, 200, 400, 100);
-      data[2][2] = new Solid(700, 100, 100, 100);
-      data[2][3] = new Solid(400, 200, 100, 100);
+      Player temp = new Player(0, 1200, 50, 50);
+      temp.connect("localhost", 34197);
+      data[0][0] = temp;
+      //data[2][0] = new Solid(600, 100, 100, 500);
+      //data[2][1] = new Solid(800, 0, 100, 500);
+      //data[2][2] = new Solid(0, 200, 400, 100);
+      //data[2][2] = new Solid(700, 100, 100, 100);
+      //data[2][3] = new Solid(400, 200, 100, 100);
       //data[3][0] = new Enemy(400, 500, 50, 50);
 
       setSize(new Dimension(Constants.WIDTH, Constants.HEIGHT)); 
